@@ -80,7 +80,7 @@ def prompt_template_general(large_text=None):
 
             ### Datapoints to Extract ###
             1. Name Insured (primary insured)
-            2. Other Named Insured (DBA) (other named insureds)
+            2. Other Named Insured  (other named insureds)
             3. Additional Insured
             4. Mailing Address
             5. Policy Number
@@ -204,7 +204,7 @@ def prompt_template_commercial_auto(large_text=None):
                 - Output must be a pure JSON object with no extra commentary.
             ### Datapoints to Extract ###
             1. Name Insured  
-            2. Other Named Insured (DBA)  
+            2. Other Named Insured 
             3. Additional Insured → [{{Name, Address}}]  
             4. Mailing Address (extract only mailing address not any other address like location address etc) 
             5. Policy Number  
@@ -289,7 +289,7 @@ def prompt_template_general_liability(large_text=None):
 
             ### Datapoints to Extract ###
             1. Name Insured (name primary insured)
-            2. Other Named Insured (DBA) - (DBA, alternate names, or any entity listed as an additional named insured, including "doing business as", "DBA", "Also Known As", "a/k/a", "t/a", "f/k/a", or similar labels. Extract all such names and return as an array. If none, return null.)
+            2. Other Named Insured - (DBA, alternate names, or any entity listed as an additional named insured, including "doing business as", "DBA", "Also Known As", "a/k/a", "t/a", "f/k/a", or similar labels. Extract all such names and return as an array. If none, return null.)
             3. Additional Insured: Includes any party listed as an additional insured under the same entity name, a separate named insured, or a 'doing business as' (DBA) designation.
             4. Mailing Address
             5. Policy Number (extract only policy number not any other text around it or any other number like reactivation number, renewal no etc)
@@ -365,7 +365,7 @@ def prompt_template_property(large_text=None):
  
     ### Datapoints to Extract ###
     1. Name Insured  
-    2. Other Named Insured (DBA)  
+    2. Other Named Insured  
     3. Additional Insured → [{{"Name": "string", "Address": "string"}}]  
     4. Mailing Address  
     5. Policy Number  (may also be labeled as qoute number)
@@ -407,7 +407,7 @@ def prompt_template_property(large_text=None):
     13. Terrorism → {{"Coverage": "string", "Premium": "string", "Exclusions": ["string"], "Inclusion_Status": "string"}}  
     14. Exclusions → all exclusions explicitly listed in the policy  
     15. Additional Interest → [{{"Name": "string", "Address": "string", "Role": "string"}}]  
-    16. Additional Coverage(s) → include all additional coverages  
+    16. Additional Coverage → include all additional coverages  
 
     17. Forms And Endorsements  
         - **Collect every form across the entire document**, including but not limited to
@@ -467,8 +467,8 @@ def prompt_template_business_owner(large_text=None):
     - Output must be **only** a valid JSON object. No explanations or commentary.
 
     ### Datapoints to Extract ###
-    1. Name Insured
-    2. Other Named Insured (DBA)
+    1. Name Insured (do not include any other named insureds here)
+    2. Other Named Insured
     3. Additional Insured (it will be with same name or other named insured or DBA )
     4. Mailing Address
     5. Policy Number
@@ -547,7 +547,7 @@ def prompt_template_business_owner(large_text=None):
     55. Umbrella Limits (Limits present under umbrella coverages)
     56. Underlying Policies(Extract only data ubder this section and return full details)
     57. Policy Exclusions (Note: Only mention Policy Exclusions not Exclusions)
-    58. Additional Coverage(s)(Extract on coverages and their values)
+    58. Additional Coverage (Extract on coverages and their values)
 
     59. Forms And Endorsements
         - Extraction only forms from "Forms And Endorsements" section.
@@ -606,7 +606,7 @@ def prompt_template_package(large_text=None):
             - Extract: Full legal name as shown on declaration page
             - Format: Exact text as written
 
-            **2. Other Named Insured (DBA)**
+            **2. Other Named Insured**
             - Extract: Any DBA or alternate business names
             - Format: Exact text, or null if absent
 
@@ -819,7 +819,7 @@ def prompt_template_package(large_text=None):
             **57. Policy Exclusions**
             - Status: ALWAYS return null (per scope rules)
 
-            **58. Additional Coverage(s)**
+            **58. Additional Coverage**
             - Extract: Coverage names and values
             - Format: Object with coverage names as keys, values as amounts
 
@@ -866,7 +866,7 @@ def prompt_template_workers_compensation(large_text=None):
 
     ### Datapoints to Extract ###
     1. Name Insured
-    2. Other Named Insured (DBA) ----- sometimes it given as DBA and in some cases it is present below the name insured 
+    2. Other Named Insured ----- sometimes it given as DBA and in some cases it is present below the name insured 
     3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
     4. Mailing Address --- below the name insured , sometimes it is mentioned as POBOX and mailing address we can consider that one also 
     5. Policy Number
