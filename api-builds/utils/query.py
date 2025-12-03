@@ -301,38 +301,39 @@ def prompt_template_general_liability(large_text=None):
             10. Miscellaneous Premium
             11. Location (Extract Full location details icluding premises number, building number, suite, city, state, zip etc if and they exist in lacation section only)
                 -Example: [ "PREM": "001","BLDG": "001", "Address": "3690 NW Adriatic Lane #107","City": "Jensen Beach","State": "FL","Zip": "34957"]
-            12. General Liability: 
-                - Extract the value **only from the "General Liability declaration page or section"**. Do not extract from other sections, schedules, or tables.
-                - For each, include both the value (e.g., "$5,000") and any descriptive text that appears after the value (e.g., "Per Occurrence", "Any One Premise", etc.).
-                - Output format for each: "<value> <descriptive text after value>" , not like "Medical expenses": "$10,000 Per Occurrence",
-                    - General Aggregate
-                    - Products or Completed Operations Aggregate
-                    - Personal And Advt Injury
-                    - Medical expenses
-                    - Damage to rented premises
-                    - Each Occurrence
-                    - Deductible (when there is no numerical value dont extract the label)
-                    - Hazards Rating Info (Must extract each and every data related to this and extract full data of each row and columns with their respective exact headers and values, dont summarize or skip any rows only skip which are not in tabular format)
-            13.Employee Benefit Liability Coverage
-            14.Hired And Non owned Coverage (don't extract from auto liability page)
-            15.Directors and Officers
-            16.Cyber(data should be extracted only which is present under the that particular "cyber" declaration page only)
-            17.Professional Liability
-            18.EPLI on Policy
-            19.Errors and Omissions on Policy (Extract only from the "Errors and Omissions" declaration page or section)
-            20.Terrorism (Extract only if it has a numerical value otherwise keep it has null)
-            21.Work Exclusion (Extract only if it has a numerical value otherwise donot extract, if no data extected keep it as null)
-            22.Additional Interest
-            23.Additional Coverage (return all coverages with values,when there is no value dont extract the label)
-            24.Forms And Endorsements
+            -12. The datapoints mentioned from 13 to 18 should follows below description and each datapoint should treated as individual primary key
+            - Extract the value **only from the "General Liability declaration page or section"**. Do not extract from other sections, schedules, or tables execpt for Schedule of Hazards Rating Info.
+            - *Schedule of Hazards Rating Info* if these details are present in this section, then extract data from other section or table which consists the Class code, Description, Rating Basis, Exposure, Final Rate, Advance Premium etc. 
+            - For each, include both the value (e.g., "$5,000") and any descriptive text that appears after the value (e.g., "Per Occurrence", "Any One Premise", etc.).
+            - Output format for each: "<value> <descriptive text after value>" , not like "Medical expenses": "$10,000 Medical Expenses Limit",
+            - Example: 
+                - "Medical expenses": "$5,000 Per Occurrence"
+                - "Personal And Advt Injury": "$1,000,000 Per Occurrence"
+                - "Damage to rented premises": "$50,000 Any One Premise"
+            13. General Aggregate Limit
+            14. Products or Completed Operations Aggregate
+            15. Personal And Advertising Injury Limit
+            16. Damage to Rented Premises Limit
+            17. Medical Payments Limit
+            18. Hazards Rating info (extract class code, Classification, Exposure, Premium Basis, Rate)
+            19. Employee Benefit Liability Coverage
+            20. Hired And Non owned Coverage (don't extract from auto liability page)
+            21. Directors and Officers
+            22. Cyber(data should be extracted only which is present under the that particular "cyber" declaration page only)
+            23. Professional Liability
+            24. EPLI on Policy
+            25. Errors and Omissions on Policy (Extract only from the "Errors and Omissions" declaration page or section)
+            26. Terrorism (Extract only if it has a numerical value otherwise keep it has null)
+            27. Work Exclusion (Extract only if it has a numerical value otherwise donot extract, if no data extected keep it as null)
+            28. Additional Interest
+            29. Additional Coverage (return all coverages with values,when there is no value dont extract the label)
+            30. Forms And Endorsements
                 - Extraction only forms from "Forms And Endorsements" section.
                 - Normalize each entry strictly in this format:
                 "FormNumber | MM/YY   Form Title" (if coverage also exist return as BOP BP0159 |  08/08  WATER EXCLUSION ENDORSEMENT )
                 - Return **all forms** as a single JSON array
-            25.EndorsementsEndorsements (Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+            31. EndorsementsEndorsements (Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
                 - Extract only from particular endorsement declaration page otherwise keep it null
-
-        
 
             ### Retrieved Sections
             {f'Text: {large_text}' if large_text else ''}
@@ -365,10 +366,10 @@ def prompt_template_property(large_text=None):
  
     ### Datapoints to Extract ###
     1. Name Insured  
-    2. Other Named Insured  
-    3. Additional Insured → [{{"Name": "string", "Address": "string"}}]  
+    2. Other Named Insured  (do not extract from additional named insureds section)
+    3. Additional Insured ( extract from Additional Named Insureds section and extract only name not address) 
     4. Mailing Address  
-    5. Policy Number  (may also be labeled as qoute number)
+    5. Policy Number ( do not extract qoute number or qoutation number)
     6. Policy Period → {{"Start": "MM/DD/YYYY", "End": "MM/DD/YYYY"}}  
     7. Issuing Company  
     8. Premium → include all coverage-level premiums and the total premium  
@@ -469,7 +470,7 @@ def prompt_template_business_owner(large_text=None):
     ### Datapoints to Extract ###
     1. Name Insured (do not include any other named insureds here)
     2. Other Named Insured
-    3. Additional Insured (it will be with same name or other named insured or DBA )
+    3. Additional Insured (it will be with same name or other named insured or DBA and should be extracted from additional named insureds section only)
     4. Mailing Address
     5. Policy Number
     6. Policy Period
@@ -483,7 +484,7 @@ def prompt_template_business_owner(large_text=None):
         - If multiple locations are listed in the declaration of location, return all as an array.
         - If no location is found in the declaration of location, set this field to null.
     
-    -12. The datapoints mentioned from 13 to 23 should follows below description and each datapoint should treated as individual primary key
+    -12. The datapoints mentioned from 13 to 22 should follows below description and each datapoint should treated as individual primary key
     - Extract the value **only from the "General Liability declaration page or section"**. Do not extract from other sections, schedules, or tables execpt for Schedule of Hazards Rating Info.
     - *Schedule of Hazards Rating Info* if these details are present in this section, then extract data from other section or table which consists the Class code, Description, Rating Basis, Exposure, Final Rate, Advance Premium etc. 
     - For each, include both the value (e.g., "$5,000") and any descriptive text that appears after the value (e.g., "Per Occurrence", "Any One Premise", etc.).
@@ -500,9 +501,7 @@ def prompt_template_business_owner(large_text=None):
     18. Each Occurrence
     19. Deductible
     20. Hired Or Non Owned Auto
-    21. Advance Premium
-    22. Additional Interest
-    23. "Schedule of Hazards Rating Info". Return as an array of dictionaries, each with:
+    21. "Schedule of Hazards Rating Info". Return as an array of dictionaries, each with:
             -Loc/BLDG No
             -TERR
             -Classification Code
@@ -511,30 +510,31 @@ def prompt_template_business_owner(large_text=None):
             -Rating Basis
             -Expoure
             -Final Rate
-            -Advance Premium
-    24. Employee Benefits Liability
-    25. Directors and Officers
-    26. Cyber(data should be extracted only which is present under the that particular "cyber" declaration page only)
-    27. Professional Liability
-    28. EPLI on Policy
-    29. Errors and Omissions on Policy
-    30. Terrorism (Extrcat only if data present at premiums or schedule of terrorism act page)
-    31. Work Exclusion
-    32. Liability locations match property locations if applicable
-    33. The datapoints mentioned from 35 to 46 should follows below description and each datapoint should treated as individual primary key
+    22. Additional Interest
+    23. Employee Benefits Liability
+    24. Directors and Officers
+    25. Cyber(data should be extracted only which is present under the that particular "cyber" declaration page only)
+    26. Professional Liability
+    27. EPLI on Policy
+    28. Errors and Omissions on Policy
+    29. Terrorism (Extrcat only if data present at premiums or schedule of terrorism act page)
+    30. Work Exclusion
+    31. Liability locations match property locations if applicable
+    32. The datapoints mentioned from 33 to 45 should follows below description and each datapoint should treated as individual primary key
     - (Need to extract the datapoints in individual dictionary but not under the general liability dictionary, And this data should be extracted which is present under the property declaration page only)
-    34. Building Value
-    35. Business Personal Property Limit - (need to extract prem.no,bldg.no labels and its values along with limit data)
-    36. Business Income Limit - (need to extract the value if it is include or present, do not extreact as "INCLUDED")
-    37. Improvements and Betterments
-    38. Wind And Hail
-    39. Property Deductible - (need to extract prem.no,bldg.no labels and its values along with limit data and all deductible under this section only)
-    40. Co Insurance
-    41. Valuation
-    42. Is Equipment Breakdown Listed
-    43. Building Ordinance Or Law Listed Cov A
-    44. Building Ordinance Demolition Cost Cov B
-    45. Building Ordinance Inc Cost Of Construction Cov C
+    33. Building Value
+    34. Business Personal Property Limit - (need to extract prem.no,bldg.no labels and its values along with limit data)
+    35. Business Income Limit - (must and should extract complete value of it and if value consists "INCLUDED" then "included" comes in last index of value)
+    36. Improvements and Betterments
+    37. Wind And Hail
+    38. Property Deductible - (need to extract prem.no,bldg.no labels and its values along with limit data and all deductible under this section only)
+    39. Co Insurance
+    40. Valuation
+    41. Is Equipment Breakdown Listed
+    42. Building Ordinance Or Law Listed Cov A
+    43. Building Ordinance Demolition Cost Cov B
+    44. Building Ordinance Inc Cost Of Construction Cov C
+    45. Additional Interests (extract only from property declaration page only)
     46. Property Terrorism (data which is present in buidling prperty values under property declarations)
     47. Inland Marine Details
     48. Equipment Schedule
@@ -548,7 +548,6 @@ def prompt_template_business_owner(large_text=None):
     56. Underlying Policies(Extract only data ubder this section and return full details)
     57. Policy Exclusions (Note: Only mention Policy Exclusions not Exclusions)
     58. Additional Coverage (Extract on coverages and their values)
-
     59. Forms And Endorsements
         - Extraction only forms from "Forms And Endorsements" section.
         - Normalize each entry strictly in this format:
@@ -667,9 +666,8 @@ def prompt_template_package(large_text=None):
             18. Each Occurrence
             19. Deductible
             20. Hired Or Non Owned Auto
-            21. Advance Premium
-            22. Additional Interest
-            23. "Schedule of Hazards Rating Info". Return as an array of dictionaries, each with:
+            21. Additional Interest
+            22. "Schedule of Hazards Rating Info". Return as an array of dictionaries, each with:
                     -Loc/BLDG No
                     -TERR
                     -Classification Code
@@ -680,91 +678,94 @@ def prompt_template_package(large_text=None):
                     -Final Rate
                     -Advance Premium
 
-            **24. Employee Benefits Liability**
+            **23. Employee Benefits Liability**
             - Extract: ONLY from its declaration page
             - Format: Object with coverage details or null
 
-            **25. Directors and Officers**
+            **24. Directors and Officers**
             - Extract: ONLY from its declaration page
             - Format: Object with coverage details or null
 
-            **26. Cyber**
+            **25. Cyber**
             - Extract: ONLY from Cyber declaration page
             - Format: Object with coverage details or null
 
-            **27. Professional Liability**
+            **26. Professional Liability**
             - Extract: ONLY from its declaration page
             - Format: Object with coverage details or null
 
-            **28. EPLI on Policy**
+            **27. EPLI on Policy**
             - Extract: ONLY from its declaration page
             - Format: Object with coverage details or null
 
-            **29. Errors and Omissions on Policy**
+            **28. Errors and Omissions on Policy**
             - Extract: Coverage details if present
             - Format: Object with details or null
 
-            **30. Terrorism**
+            **29. Terrorism**
             - Extract: ONLY if present in premiums or "Schedule of Terrorism Act" page
             - Format: Object with details or null
 
-            **31. Work Exclusion**
+            **30. Work Exclusion**
             - Status: ALWAYS return null (per scope rules)
 
-            **32. Liability locations match property locations if applicable**
+            **31. Liability locations match property locations if applicable**
             - Status: ALWAYS return null (per scope rules)
 
-            **33. The datapoints mentioned from 35 to 46 should follows below description and each datapoint should treated as individual primary key
+            **32. The datapoints mentioned from 35 to 46 should follows below description and each datapoint should treated as individual primary key
             - (Need to extract the datapoints in individual dictionary but not under the general liability dictionary, And this data should be extracted which is present under the property declaration page only)
 
             **IMPORTANT: For fields marked as ARRAY, must extract ALL occurrences with format mentioned and return as array of strings**
 
-            34. "Building Value": ARRAY - Extract ALL buildings
+            33. "Building Value": ARRAY - Extract ALL buildings
             * Format per entry: "Location Number : XXXX - Building Number : XXX - $X,XXX,XXX - Cause Of Loss : [type] - Premium : $X,XXX.XX"
             * Example: ["Location Number : 0001 - Building Number : 001 - $4,722,000 - Cause Of Loss : Special Including Theft - Premium : $6,324.00"]
 
-            35. "Business Personal Property Limit": ARRAY - Extract ALL occurrences
+            34. "Business Personal Property Limit": ARRAY - Extract ALL occurrences
             * Format per entry: "Location Number : XXXX - Occupancy Number : XXX - $XXX,XXX - Cause Of Loss : [type] - Premium : $X,XXX.XX"
             * Example: ["Location Number : 0001 - Occupancy Number : 001 - $472,200 - Cause Of Loss : Special Including Theft - Premium : $1,283.00"]
 
-            36. "Business Income Limit": ARRAY - Extract ALL occurrences
+            35. "Business Income Limit": ARRAY - Extract ALL occurrences
             * Format per entry: "Location Number : XXXX - Building Number : XXX - $XXX,XXX - Cause Of Loss : [type] - Premium : $X,XXX.XX"
 
-            37. "Improvements and Betterments": ARRAY - Extract ALL occurrences
+            36. "Improvements and Betterments": ARRAY - Extract ALL occurrences
             * Format per entry: "Location Number : XXXX - Building Number : XXX - $XXX,XXX - Cause Of Loss : [type] - Premium : $X,XXX.XX"
 
-            38. "Wind And Hail": ARRAY - Extract ALL occurrences
+            37. "Wind And Hail": ARRAY - Extract ALL occurrences
             * Format per entry: "Location Number : XXXX - Building Number : XXX - Building - Wind Or Hail Deductible : X%"
             * Example: ["Location Number : 0001 - Building Number : 001 - Building - Wind Or Hail Deductible : 2%"]
 
-            39. "Property Deductible": ARRAY - Extract ALL deductibles under this section
+            38. "Property Deductible": ARRAY - Extract ALL deductibles under this section
             * Format per entry: "Location Number : XXXX - Building Number : XXX - Building - $X,XXX"
             * Example: ["Location Number : 0001 - Building Number : 001 - Building - $5,000", "Location Number : 0002 - Building Number : 001 - Building - $7,500"]
 
-            40. "Co Insurance": ARRAY - Extract ALL occurrences with COMPLETE location and building identifiers
+            39. "Co Insurance": ARRAY - Extract ALL occurrences with COMPLETE location and building identifiers
             * **CRITICAL**: DO NOT extract just "80%" - MUST include Co insurance of all locations and buildings with their numbers
             * Format per entry: "LOCATION : # X - BUILDING # X - Building : XX%"
             * Example: ["LOCATION : # 1 - BUILDING # 1 - Building : 80%", "LOCATION : # 2 - BUILDING # 1 - Building : 80%"]
             * If document uses "Location Number" format, use: "Location Number : XXXX - Building Number : XXX - Building - XX%"
             * Extract the ENTIRE row/line including all location identifiers, not just the percentage
 
-            41. "Valuation": ARRAY - Extract ALL occurrences with COMPLETE location and building identifiers
+            40. "Valuation": ARRAY - Extract ALL occurrences with COMPLETE location and building identifiers
             * **CRITICAL**: DO NOT extract just "RC" or "Replacement Cost" - MUST include location and building numbers
             * Format per entry: "Location Number : XXXX - Building Number : XXX - Building - [valuation type]"
             * Example: ["Location Number : 0001 - Building Number : 001 - Building - Replacement Cost", "Location Number : 0002 - Building Number : 001 - Building - Actual Cash Value"]
             * If document uses "LOCATION : #" format, adapt accordingly
             * Extract the ENTIRE row/line including all location identifiers, not just the valuation type
 
-            42. "Is Equipment Breakdown Listed": "Yes" or "No" or null
+            41. "Is Equipment Breakdown Listed": "Yes" or "No" or null
 
-            43. "Building Ordinance Or Law Listed Cov A": ARRAY or null - Extract ALL if multiple
+            42. "Building Ordinance Or Law Listed Cov A": ARRAY or null - Extract ALL if multiple
             * Format per entry: "Location Number : XXXX - Building Number : XXX - $XXX,XXX" or just amount
 
-            44. "Building Ordinance Demolition Cost Cov B": ARRAY or null - Extract ALL if multiple
+            43. "Building Ordinance Demolition Cost Cov B": ARRAY or null - Extract ALL if multiple
             * Format per entry: "Location Number : XXXX - Building Number : XXX - $XXX,XXX" or just amount
 
-            45. "Building Ordinance Inc Cost Of Construction Cov C": ARRAY or null - Extract ALL if multiple
+            44. "Building Ordinance Inc Cost Of Construction Cov C": ARRAY or null - Extract ALL if multiple
             * Format per entry: "Location Number : XXXX - Building Number : XXX - $XXX,XXX" or just amount
+
+            45. "Additional Interests": ARRAY of objects or null
+            - Extract: ALL additional interests (from property section only)
 
             **46. Property Terrorism**
             - Extract: Terrorism values within building property values under Property declarations
