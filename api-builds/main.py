@@ -66,36 +66,90 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
 
 # ---------------- DATA POINTS AND PROMPT MAP ----------------
 from utils.data_points import (
-    cyber_data_points, general_liability_data_points,
-    business_owner_data_points, comercial_auto_data_points, workers_compensation_points, property_data_points
-)
-from utils.query import (
-    prompt_template_cyber, prompt_template_general,
-    prompt_template_commercial_auto, prompt_template_general_liability,
-    prompt_template_property, prompt_template_business_owner, prompt_template_package, prompt_template_workers_compensation
-)
+        cyber_data_points,
+        general_liability_data_points,
+        business_owner_data_points,
+        comercial_auto_data_points,
+        workers_compensation_points,
+        property_data_points,
+        builder_risk_points,
+        commercial_earthquake_points,
+        commercial_fire_points,
+        commercial_flood_points,
+        crime_points,
+        directors_and_officers_points,
+        dwelling_fire_points,
+        epli_points,
+        errors_omissions_points,
+        umbrella_points,
+        master_business_owners_points
+    )
+    from utils.queryy import (
+        prompt_template_cyber,
+        prompt_template_general,
+        prompt_template_commercial_auto,
+        prompt_template_general_liability,
+        prompt_template_property,
+        prompt_template_business_owner,
+        prompt_template_package,
+        prompt_template_workers_compensation,
+        prompt_template_builder_risk,
+        prompt_template_commercial_earthquake,
+        prompt_template_commercial_fire,
+        prompt_template_commercial_flood,
+        prompt_template_crime,
+        prompt_template_directors_and_officers,
+        prompt_template_dwelling_fire,
+        prompt_template_epli,
+        prompt_template_errors_omissions,
+        prompt_umbrella,
+        prompt_master_bop
+    )
 
 prompt_map = {
-    "cyber": prompt_template_cyber,
-    "general": prompt_template_general,
-    "comercial_auto": prompt_template_commercial_auto,
-    "general_liability": prompt_template_general_liability,
-    "property": prompt_template_property,
-    "business_owner": prompt_template_business_owner,
-    "package": prompt_template_business_owner,
-    "workers_comp": prompt_template_workers_compensation
-}
+        "cyber": prompt_template_cyber,
+        "general": prompt_template_general,
+        "comercial_auto": prompt_template_commercial_auto,
+        "general_liability": prompt_template_general_liability,
+        "property": prompt_template_property,
+        "business_owner": prompt_template_business_owner,
+        "package": prompt_template_package,
+        "workers_comp": prompt_template_workers_compensation,
+        "builders_risk": prompt_template_builder_risk,
+        "commercial_earthquake": prompt_template_commercial_earthquake,
+        "commercial_fire": prompt_template_commercial_fire,
+        "commercial_flood": prompt_template_commercial_flood,
+        "crime": prompt_template_crime,
+        "directors_and_officers": prompt_template_directors_and_officers,
+        "dwelling_fire": prompt_template_dwelling_fire,
+        "epli": prompt_template_epli,
+        "errors_and_omissions": prompt_template_errors_omissions,
+        "umbrella" : prompt_umbrella,
+        "master_bop" : prompt_master_bop
 
-data_points_map = {
-    "cyber": cyber_data_points,
-    "general": business_owner_data_points,
-    "comercial_auto": comercial_auto_data_points,
-    "general_liability": general_liability_data_points,
-    "property": property_data_points,
-    "business_owner": business_owner_data_points,
-    "package": business_owner_data_points,
-    "workers_comp": workers_compensation_points
-}
+    }
+
+    data_points_map = {
+        "cyber": cyber_data_points,
+        "general": business_owner_data_points,
+        "comercial_auto": comercial_auto_data_points,
+        "general_liability": general_liability_data_points,
+        "property": property_data_points,
+        "business_owner": business_owner_data_points,
+        "package": business_owner_data_points,
+        "workers_comp": workers_compensation_points,
+        "builders_risk": builder_risk_points,
+        "commercial_earthquake": commercial_earthquake_points,
+        "commercial_fire": commercial_fire_points,
+        "commercial_flood": commercial_flood_points,
+        "crime" : crime_points,
+        "directors_and_officers" : directors_and_officers_points,
+        "dwelling_fire" : dwelling_fire_points,
+        "epli" : epli_points,
+        "errors_and_omissions" : errors_omissions_points,
+        "umbrella" : umbrella_points,
+        "master_bop" : master_business_owners_points
+    }
 
 
 # Create necessary directories
