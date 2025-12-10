@@ -365,8 +365,8 @@ def prompt_template_property(large_text=None):
   
  
     ### Datapoints to Extract ###
-    1. Name Insured  
-    2. Other Named Insured  (do not extract from additional named insureds section)
+    1. Name Insured (primary insured only, do not include any other named insureds here like DBA etc) 
+    2. Other Named Insured  (it may have like DBA, do not extract from additional named insureds section)
     3. Additional Insured ( extract from Additional Named Insureds section and extract only name not address) 
     4. Mailing Address  
     5. Policy Number ( do not extract qoute number or qoutation number)
@@ -468,8 +468,8 @@ def prompt_template_business_owner(large_text=None):
     - Output must be **only** a valid JSON object. No explanations or commentary.
 
     ### Datapoints to Extract ###
-    1. Name Insured (do not include any other named insureds here)
-    2. Other Named Insured
+    1. Name Insured (primary insured only, do not include any other named insureds here like DBA etc) 
+    2. Other Named Insured  (it may have like DBA, do not extract from additional named insureds section)
     3. Additional Insured (it will be with same name or other named insured or DBA and should be extracted from additional named insureds section only)
     4. Mailing Address
     5. Policy Number
@@ -965,3 +965,1058 @@ def prompt_template_workers_compensation(large_text=None):
 
      {f'Text: {large_text}' if large_text else ''}
     """
+
+def prompt_template_builder_risk(large_text=None):
+    return f"""
+    You are an expert insurance data extractor.
+    The following text is extracted from a Workers Compensation insurance PDF using a mix of
+    digital text, OCR text, and tables.  
+    Some forms or endorsements may be spread across multiple pages or split into separate
+    lines. Your task is to search the **ENTIRE** document and extract every required
+    datapoint listed below.  
+
+    ### Rules for Extraction
+    - **Never stop** at the first occurrence of any section.  
+      Continue scanning until the **very end of the document** to ensure nothing is missed.
+    - Merge multi-line form numbers/titles into a **single entry** if they are split.
+    - Deduplicate only when the text is **identical**.
+    - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+    - If no value exists for a field, set it to `null`
+
+    ### Datapoints to Extract ###
+    1. Name Insured
+    2. Other Named Insured ----- sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+    3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
+    4. Mailing Address 
+    5. Policy Number
+    6. Policy Period
+    7. Issuing Company 
+    8. Premium
+    9. Paid in Full Discount
+    10. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names) -- yes 
+    11. Location Address
+        - no need to extract Property Location 
+        - Extract location details **only from the "declaration of location" page or section**.
+        - Do not extract location data from other sections, schedules, or tables.
+        - need to extract loc label and its value along with address
+        - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+        - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+        - if one or more location is present we have to extract like this ---
+    12. Family Dwelling ----  if boolean present, then we need to extract the "true" value label  with the value along with its limit.
+    13. Single structure policy ----  this data point that contains a boolean value, but we should not extract direct the boolean itself. Instead, we need to extract the true value label  with the value along with its limit.
+    14. Commercial Structure ----it was shown as null because it was a false val no need to shown label also 
+    15. New Construction ---- this data point is not in check box so should not extract boolean val , we need to extract limits which are present below  of the New Construction 
+    16. Remodeling 
+    17. Limits
+    18. Deductible ---- need to extract check box value 
+    19. Amount of loss or damage
+    20. Terrorism -------  sometimes it is present in the premiums or it has a sapreate page
+    21. Exclusions --- Donot extract this datapoint, pass it has null value
+    22. Additional Coverage --- must extract value with their labels from Additional Coverage section only, no coverages should extract from other sections
+    23. Additional Interests
+    24. Forms And Endorsements — extraction rules
+        -Extract ONLY from the "Forms And Endorsements" section.
+        -Scan to END of document.
+        -Merge multi-line entries into a single entry.
+        -Format EXACTLY as:
+            FormNumber | MM/YY Form Title
+        -If a coverage code exists, format as:
+            CoverageCode FormNumber | MM/YY Form Title
+        -Form Title Extraction Rule (STRICT)
+        -Extract a Form Title ONLY if it appears on the SAME LINE and IMMEDIATELY to the right of the Form Number and Date.
+        -If no title appears beside the form number and date on the same line, DO NOT extract a title.
+        -Do not extract titles from any other position (different line, different column, separated by layout, etc.).
+
+        --Return Requirements
+            -Return a single array of all extracted forms.
+            -Deduplicate exact duplicates only.
+            -If a form has no title, return it as:
+            -FormNumber | MM/YY
+    25. Endorsements
+        - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+        - Extract only from particular endorsement declaration page  ---- it mentioned as Endorsements and whatever you mentioned that only we have to extract
+    ### Output Rules
+    - Return **only** the structured JSON object with the keys above in the exact order.
+    - Dates → MM/DD/YYYY
+    - Currency → keep "$" and commas as shown.
+    - Missing values → null.
+     {f'Text: {large_text}' if large_text else ''}
+    """
+
+def prompt_template_commercial_earthquake(large_text=None):
+    return f"""
+    You are an expert insurance data extractor.
+    The following text is extracted from a Commercial Earthquake insurance PDF using a mix of
+    digital text, OCR text, and tables.  
+    Some forms or endorsements may be spread across multiple pages or split into separate
+    lines. Your task is to search the **ENTIRE** document and extract every required
+    datapoint listed below.  
+
+    ### Rules for Extraction
+    - **Never stop** at the first occurrence of any section.  
+      Continue scanning until the **very end of the document** to ensure nothing is missed.
+    - Merge multi-line form numbers/titles into a **single entry** if they are split.
+    - Deduplicate only when the text is **identical**.
+    - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+    - If no value exists for a field, set it to `null`
+
+    ### Datapoints to Extract ###
+    1. Name Insured
+    2. Other Named Insured
+        - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+        - No need extract "DBA" in value
+    3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
+    4. Mailing Address 
+    5. Policy Number
+    6. Policy Period
+    7. Issuing Company 
+    8. Premium
+        - Need to extract all premiums under the Premium declaration section only not from other sections(need to extract with their labels)
+    9. Paid in Full Discount
+    10. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names) -- yes 
+    11. Location
+        - Extract location details **only from the "declaration of location" page or section**.
+        - Do not extract location data from other sections, schedules, or tables.
+        - need to extract loc label and its value along with address
+        - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+        - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+        - if one or more location is present we have to extract like this ---
+    12. Building Value
+        - SCHEDULE OF COVERAGES , PROPERTY COVERAGES in those pages the building value is presnt.
+        - If there are more than one location or  builidng values are present then along with lacation and bulding value has to bee extract along with lables like mention below
+    13. Improvements And Betterments
+    14. Business Personal Property Limit
+    15. Business Income Limit
+    16. Earthquake Limits
+        - extract the limits under earthquake declaration page  
+        - extract from  Limit of Insurance, any one "loss occurrence" 
+    18. Earthquake Deductible
+    19. Wind and Hail
+    20. Deductible
+    21. Co Insurance
+        - most of the cases the data present , in where the bulding value is present , otherwsie it is present in the limits page 
+        - If there are more than one location or  builidng values are present then along with lacation and bulding value has to bee extract along with lables like mention below
+    22. Valuation
+        - most of the cases the data present , in where the bulding value is present , otherwsie it is present in the limits page 
+        - If more than one bulding values are present, then extract all of them as individual along with their labels
+    22. Is Equipment Breakdown Listed
+    23. Building Ordinance Or Law Listed Cov A
+    24. Building Ordinance Demolition Cost Cov B
+    25. Building Ordinance Inc Cost Of Construction Cov C
+    26. Terrorism
+    27. Exclusions
+        - Pass this datapoint as null
+    28. Additional Coverage
+    29. Forms And Endorsements
+        - Extract: ONLY from "Forms And Endorsements" section
+            - Scan to END of document
+            - Merge multi-line entries into single entry
+            - Format EXACTLY: "FormNumber | MM/YY   Form Title"
+            - If coverage code exists: "BOP BP0159 | 08/08  WATER EXCLUSION ENDORSEMENT"
+            - Return: Single array of ALL forms (deduplicate exact duplicates only) --- yes 
+    30. Endorsements
+        - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+        - Extract only from particular endorsement declaration page  ---- it mentioned as Endorsements and whatever you mentioned that only we have to extract 
+
+    ### Output Rules
+    - Return complete details for all datapoints with their exact labels with values.
+    - Return **only** the structured JSON object with the keys above in the exact order.
+    - Dates → MM/DD/YYYY
+    - Currency → keep "$" and commas as shown.
+    - Missing values → null.
+
+     {f'Text: {large_text}' if large_text else ''}
+    """
+
+def prompt_template_commercial_fire(large_text=None):
+    return f"""
+    You are an expert insurance data extractor.
+    The following text is extracted from a Commercial Fire insurance PDF using a mix of
+    digital text, OCR text, and tables.  
+    Some forms or endorsements may be spread across multiple pages or split into separate
+    lines. Your task is to search the **ENTIRE** document and extract every required
+    datapoint listed below.  
+
+    ### Rules for Extraction
+    - **Never stop** at the first occurrence of any section.  
+      Continue scanning until the **very end of the document** to ensure nothing is missed.
+    - Merge multi-line form numbers/titles into a **single entry** if they are split.
+    - Deduplicate only when the text is **identical**.
+    - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+    - If no value exists for a field, set it to `null`
+
+    ### Datapoints to Extract ###
+    1. Name Insured
+    2. Other Named Insured ----- sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+    3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
+    4. Mailing Address 
+    5. Policy Number
+    6. Policy Period
+    7. Issuing Company 
+    8. Premium
+        - Need to extract all premiums under the Premium declaration section only not from other sections(need to extract with their labels)
+    9. Paid in Full Discount
+    10. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names) -- yes 
+    11. Location
+        - Extract location details **only from the "declaration of location" page or section**.
+        - Do not extract location data from other sections, schedules, or tables.
+        - need to extract loc label and its value along with address
+        - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+        - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+        - if one or more location is present we have to extract like this ---
+    12. Building Value
+        - SCHEDULE OF COVERAGES , PROPERTY COVERAGES in those pages the building value is presnt.
+        - If there are more than one location or  builidng values are present then along with lacation and bulding value has to bee extract along with lables like mention below
+        - "Location#  : 1 - Building# :1 - Building : $ 200,000"
+    13. Improvements And Betterments
+    14. Business Personal Property Limit
+    15. Business Income Limit
+    16. Cause of Loss
+        - most of the cases the data present , in where the bulding value is present , otherwsie it is present in the limits page 
+        - If more than one bulding values are present, then extract all of them as individual along with their labels
+        - Do not treat Premiums as cause of loss, the value will be present in builidng value section
+    17. Wind and Hail
+    18. Deductible
+    19. Co Insurance
+        - most of the cases the data present , in where the bulding value is present , otherwsie it is present in the limits page 
+        - If there are more than one location or  builidng values are present then along with lacation and bulding value has to bee extract along with lables like mention below
+        - "Location# : 1 - Building# : 1 - Coinsurance: 80%",
+    20. Valuation
+        - most of the cases the data present , in where the bulding value is present , otherwsie it is present in the limits page 
+        - If more than one bulding values are present, then extract all of them as individual along with their labels
+    21. Is Equipment Breakdown Listed
+    22. Building Ordinance Or Law Listed Cov A
+    23. Building Ordinance Demolition Cost Cov B
+    24. Building Ordinance Inc Cost Of Construction Cov C
+    25. Terrorism
+    26. Exclusions
+        - Pass this datapoint as null
+    27. Additional Interest
+    28. Additional Coverage
+        - Only the remaining limits after extracting every required data point are considered as additional limits.
+        - Premium values are not treated as additional limits.
+
+    29. Forms And Endorsements
+        - Extract: ONLY from "Forms And Endorsements" section
+            - Scan to END of document
+            - Merge multi-line entries into single entry
+            - Format EXACTLY: "FormNumber | MM/YY   Form Title", if total year is present then format should be like : "FormNumber | MM/YYYY   Form Title"
+            
+            - If coverage code exists: "BOP BP0159 | 08/08  WATER EXCLUSION ENDORSEMENT"
+            - Return: Single array of ALL forms (deduplicate exact duplicates only) --- yes 
+    30. Endorsements
+        - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+        - Extract only from particular endorsement declaration page  ---- it mentioned as Endorsements and whatever you mentioned that only we have to extract 
+
+    ### Output Rules
+    - Return complete details for all datapoints with their exact labels with values.
+    - Return **only** the structured JSON object with the keys above in the exact order.
+    - Dates → MM/DD/YYYY
+    - Currency → keep "$" and commas as shown.
+    - Missing values → null.
+
+     {f'Text: {large_text}' if large_text else ''}
+    """
+
+def prompt_template_commercial_flood(large_text=None):
+    return f"""
+    You are an expert insurance data extractor.
+    The following text is extracted from a Commercial Flood insurance PDF using a mix of
+    digital text, OCR text, and tables.  
+    Some forms or endorsements may be spread across multiple pages or split into separate
+    lines. Your task is to search the **ENTIRE** document and extract every required
+    datapoint listed below.  
+
+    ### Rules for Extraction
+    - **Never stop** at the first occurrence of any section.  
+      Continue scanning until the **very end of the document** to ensure nothing is missed.
+    - Merge multi-line form numbers/titles into a **single entry** if they are split.
+    - Deduplicate only when the text is **identical**.
+    - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+    - If no value exists for a field, set it to `null`
+
+    ### Datapoints to Extract ###
+    1. Name Insured
+    2. Other Named Insured (in some cases it is present below the name insured and do not extract from additional named insured section and DBA )
+    3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
+    4. Mailing Address 
+    5. Policy Number
+    6. Policy Period
+    7. Issuing Company 
+    8. Premium
+        - Need to extract all premiums under the Premium declaration section(need to extract with their labels)
+    9. Paid in Full Discount
+    10. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names) -- yes 
+    11. Location
+        - Extract location details **only from the "declaration of location" page or section**.
+        - No need to extract to Property Location like this : (Property Location: 1318 MAIN ST, SCOTT CITY MO 63780), it should be like : (Location: 1318 MAIN ST, SCOTT CITY MO 63780)
+        - Do not extract location data from other sections, schedules, or tables.
+        - need to extract loc label and its value along with address
+        - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+        - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+        - if one or more location is present we have to extract like this ---
+    12. Building Value
+    13. Improvements And Betterments
+    14. Business Personal Property Limit --- need to extract with contents label
+    15. Business Income Limit
+    16. Flood Limits
+        - Extract limits and coverages that present under "flood declaration" section only
+        - Donot include "Limit of Liability" for every datapoint like "Building Property A. Limit of Liability $750,000",
+    17. Wind and Hail
+    18. Deductible
+    19. Co Insurance
+    20. Valuation ----need to extract replacement cost with label and limit under valuation datapoint
+    21. Is Equipment Breakdown Listed
+    22. Building Ordinance Or Law Listed Cov A
+    23. Building Ordinance Demolition Cost Cov B
+    24. Building Ordinance Inc Cost Of Construction Cov C
+    25. Terrorism
+    26. Exclusions
+        - Pass this datapoint as null
+    27. Additional Interest
+    28. Additional Coverage 
+        - Extract only from Additional Coverage section
+    29. Forms And Endorsements
+        - Extract: ONLY from "Forms And Endorsements" section
+            - Scan to END of document
+            - Should return unique from number and date and return only which have form number and date
+            - Merge multi-line entries into single entry
+            - Format EXACTLY: "FormNumber | MM/YY   Form Title"
+            - If coverage code exists: "BOP BP0159 | 08/08  WATER EXCLUSION ENDORSEMENT"
+            - Return: Single array of ALL forms (deduplicate exact duplicates only) --- yes 
+    30. Endorsements
+        - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+        - Extract only from particular endorsement declaration page  ---- it mentioned as Endorsements and whatever you mentioned that only we have to extract 
+
+    ### Output Rules
+    - Return complete details for all datapoints with their exact labels with values.
+    - Return **only** the structured JSON object with the keys above in the exact order.
+    - Dates → MM/DD/YYYY
+    - Currency → keep "$" and commas as shown.
+    - Missing values → null.
+
+     {f'Text: {large_text}' if large_text else ''}
+    """
+
+def prompt_template_crime(large_text=None):
+    return f"""
+    You are an expert insurance data extractor.
+    The following text is extracted from a Crime insurance PDF using a mix of
+    digital text, OCR text, and tables.  
+    Some forms or endorsements may be spread across multiple pages or split into separate
+    lines. Your task is to search the **ENTIRE** document and extract every required
+    datapoint listed below.  
+
+    ### Rules for Extraction
+    - **Never stop** at the first occurrence of any section.  
+      Continue scanning until the **very end of the document** to ensure nothing is missed.
+    - Merge multi-line form numbers/titles into a **single entry** if they are split.
+    - Deduplicate only when the text is **identical**.
+    - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+    - If no value exists for a field, set it to `null`
+
+    ### Datapoints to Extract ###
+    - The following datapoints should extract from only "Crime" section, not from other sections like cyber, property etc.
+    1. Name Insured (primary insured only, do not include district orany other named insureds here like DBA etc) 
+    2. Other Named Insured  (extract all other names except primary name, it may have like DBA, do not extract from additional named insureds section)
+    3. Mailing Address 
+    4. Policy Number
+    5. Policy Period
+    6. Issuing Company 
+    7. Premium
+        - Extract premium of crime declaration section
+        - Extraction should be like example metioned below
+        - Example : "Premium": [
+                {{
+                "value": "Crime - EMC -  Expiring Annual Premium : $723.00 - Renewal Annual Premiums: $638.00",
+                "type": "string"
+                }}
+            ]
+    8. Paid in Full Discount
+    9. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names) -- yes 
+    10. Location
+        - Extract location details **only from the "declaration of location" page or section**.
+        - Do not extract location data from other sections, schedules, or tables.
+        - need to extract loc label and its value along with address
+        - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+        - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+        - if one or more location is present we have to extract like this ---
+    11. Limts of Insurance 
+        only extract from crime section not from other sections
+        Extraction should be like example metioned below
+        Example : Limts of Insurance": [
+                    {{
+                    "value": "Employee Theft ---- Per Loss Coverage  : PER SCHED",
+                    "type": "string"
+                    }},
+                    {{
+                    "value": "Employee Theft ---- Per Employee Coverage  : NOT COVERED ",
+                    "type": "string"
+                    }}]
+    12. Retention
+        Extraction should be like example metioned below
+        Example :"Retention": [
+                {{
+                "value": "1. Employee Theft - Deductible Amount Per Occurrence : $ 1,000",
+                "type": "string"
+                }}
+            ]
+    13. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured)
+    14. Additional Interest
+    15. Additional Coverage 
+        - Extract all coverages values which only under "crime" section not from other sections like cyber, property etc.
+        - The extraction should be formatted like under the example metioned below
+        - Example : "Additional Coverage": [
+            {{
+            "value": "Item Number : 1 - Names Of Covered Employees : BOB HEMBROCK - Limit Of Insurance On Each Employee : $100,000 - Deductible Amount On Each Employee : $1,000",
+            "type": "string"
+            }},
+            {{
+            "value": "Item Number : 2 - Names Of Covered Employees : KAREN JACKSON - Limit Of Insurance On Each Employee : $100,000 - Deductible Amount On Each Employee : $1,000",
+            "type": "string"
+            }}]
+    16. Terrorism
+    17. Exclusions 
+        - keep this datapoint as null
+    18. Forms And Endorsements
+        - Extract: ONLY from "Forms And Endorsements" section not from other sections like POLICYWRITING INDEX  or  COMPUTER PRODUCED FORMS  etc.
+            - Scan to END of document
+            - Merge multi-line entries into single entry
+            - Format EXACTLY: "FormNumber | MM/YY   Form Title"
+            - If coverage code exists: "BOP BP0159 | 08/08  WATER EXCLUSION ENDORSEMENT"
+            - Return: Single array of ALL forms (deduplicate exact duplicates only) --- yes 
+    19. Endorsements
+        - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+        - Extract only from particular endorsement declaration page  ---- it mentioned as Endorsements and whatever you mentioned that only we have to extract 
+
+    ### Output Rules
+    - Return complete details for all datapoints with their exact labels with values.
+    - Return **only** the structured JSON object with the keys above in the exact order.
+    - Dates → MM/DD/YYYY
+    - Currency → keep "$" and commas as shown.
+    - Missing values → null.
+
+     {f'Text: {large_text}' if large_text else ''}
+    """
+
+def prompt_template_directors_and_officers(large_text=None):
+    return f"""
+        You are an expert insurance data extractor.
+        The following text is extracted from a Directors and Officers insurance PDF using a mix of
+        digital text, OCR text, and tables.  
+        Some forms or endorsements may be spread across multiple pages or split into separate
+        lines. Your task is to search the **ENTIRE** document and extract every required
+        datapoint listed below.  
+
+        ### Rules for Extraction
+        - **Never stop** at the first occurrence of any section.  
+        Continue scanning until the **very end of the document** to ensure nothing is missed.
+        - Merge multi-line form numbers/titles into a **single entry** if they are split.
+        - Deduplicate only when the text is **identical**.
+        - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+        - If no value exists for a field, set it to `null`
+
+        ### Datapoints to Extract ###
+        1. Name Insured (primary insured only, do not include any other named insureds here like DBA etc) 
+        2. Other Named Insured
+            - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+            - No need extract "DBA" in value
+        3. Additional Insured (it will be with same name or other named insured or DBA and should be extracted from additional named insureds section only)
+        4. Mailing Address 
+        5. Policy Number
+        6. Policy Period
+        7. Issuing Company 
+        8. Premium
+        9. Paid in Full Discount
+        10. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names) -- yes 
+        11. Location
+            - Extract location details **only from the "declaration of location" page or section**.
+            - Do not extract location data from other sections, schedules, or tables.
+            - need to extract loc label and its value along with address
+            - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+            - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+            - Do not extract property location
+        12. Business Classification
+        13. Limits of Liability
+        14. Deductible or Retention
+        15. Retro Date
+        16. Prior and Pending Date
+        17. Continuity Date
+        18. Underlying Insurance
+        19. Terrorism
+        20. Exclusions - do not extract, pass null to this datapoint
+        21. Additional Coverage
+        22. Forms And Endorsements
+            - Extract: ONLY from "Forms And Endorsements" section
+            - Scan to END of document
+            - Merge multi-line entries into single entry
+            - Format EXACTLY: "FormNumber | MM/YY   Form Title" 
+            - If coverage code exists: "BOP BP0159 | 08/08  WATER EXCLUSION ENDORSEMENT"
+            - Return: Single array of ALL forms (deduplicate exact duplicates only) --- yes 
+        23. Endorsements
+            - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+            - Extract only from particular "endorsement" declaration page
+
+        ### Output Rules
+        - Return complete details for all datapoints with their exact labels with values.
+        - Return **only** the structured JSON object with the keys above in the exact order.
+        - Dates → MM/DD/YYYY
+        - Currency → keep "$" and commas as shown.
+        - Missing values → null.
+
+        {f'Text: {large_text}' if large_text else ''}
+        """
+
+def prompt_template_dwelling_fire(large_text=None):
+    return f"""
+        You are an expert insurance data extractor.
+        The following text is extracted from a Dwelling Fire insurance PDF using a mix of
+        digital text, OCR text, and tables.  
+        Some forms or endorsements may be spread across multiple pages or split into separate
+        lines. Your task is to search the **ENTIRE** document and extract every required
+        datapoint listed below.  
+
+        ### Rules for Extraction
+        - **Never stop** at the first occurrence of any section.  
+        Continue scanning until the **very end of the document** to ensure nothing is missed.
+        - Merge multi-line form numbers/titles into a **single entry** if they are split.
+        - Deduplicate only when the text is **identical**.
+        - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+        - If no value exists for a field, set it to `null`
+
+        ### Datapoints to Extract ###
+        1. Name Insured (primary insured only, do not include any other named insureds here like DBA etc) 
+        2. Other Named Insured
+            - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+            - No need extract "DBA" in value
+        3. Additional Insured (it will be with same name or other named insured or DBA and should be extracted from additional named insureds section only)
+        4. Mailing Address
+        5. Physical Address 
+        6. Policy Number
+        7. Policy Period
+        8. Issuing Company
+        9. Premium
+            - Need to values with labels
+        10. Paid in Full Discount
+        11. Miscellaneous Premium
+        12. Dwelling Limit
+            - Need extract full value with their labels like mentioned below
+            - "$ 566,277 - ANNUAL PREMIUM : 883.00"
+        13. Other Structures
+            - Include complete details
+        14. Fair Rental Value
+        15. Loss of use
+            - Need extract full value with their labels
+        16. Personal Property
+            - Need extract full value with their labels
+        17. Personal Liability
+            - Need extract full value with their labels
+            - Annual premium should extracted if present
+        18. Additional Living Expense
+        19. Medical Payments
+        20. Deductibles
+        21. Windhail
+        22. Water Backup
+        23. Property Info
+        24. Terrorism
+        25. Exclusions
+        26. Additional Interest
+        27. Additional Coverage
+        28. Forms And Endorsements — extraction rules
+            -Extract ONLY from the "Forms And Endorsements" section.
+            -Scan to END of document.
+            -Merge multi-line entries into a single entry.
+            -Format EXACTLY as:
+                FormNumber | MM/YY Form Title
+            -If a coverage code exists, format as:
+                CoverageCode FormNumber | MM/YY Form Title
+            -Form Title Extraction Rule (STRICT)
+            -Extract a Form Title ONLY if it appears on the SAME LINE and IMMEDIATELY to the right of the Form Number and Date.
+            -If no title appears beside the form number and date on the same line, DO NOT extract a title.
+            -Do not extract titles from any other position (different line, different column, separated by layout, etc.).
+
+            --Return Requirements
+                -Return a single array of all extracted forms.
+                -Deduplicate exact duplicates only.
+                -If a form has no title, return it as:
+                -FormNumber | MM/YY
+        29. Endorsements
+        - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+        - Extract only from particular endorsement declaration page
+        ### Output Rules
+        - Return **only** the structured JSON object with the keys above in the exact order.
+        - Dates → MM/DD/YYYY
+        - Currency → keep "$" and commas as shown.
+        - Missing values → null.
+        {f'Text: {large_text}' if large_text else ''}
+        """
+    
+def prompt_template_epli(large_text=None):
+    return f"""
+        You are an expert insurance data extractor.
+        The following text is extracted from a EPLI insurance PDF using a mix of
+        digital text, OCR text, and tables.  
+        Some forms or endorsements may be spread across multiple pages or split into separate
+        lines. Your task is to search the **ENTIRE** document and extract every required
+        datapoint listed below.  
+
+        ### Rules for Extraction
+        - **Never stop** at the first occurrence of any section.  
+        Continue scanning until the **very end of the document** to ensure nothing is missed.
+        - Merge multi-line form numbers/titles into a **single entry** if they are split.
+        - Deduplicate only when the text is **identical**.
+        - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+        - If no value exists for a field, set it to `null`
+
+        ### Datapoints to Extract ###
+        1. Name Insured (primary insured only, do not include any other named insureds here like DBA etc) 
+        2. Other Named Insured
+            - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+            - No need extract "DBA" in value
+        3. Additional Insured (it will be with same name or other named insured or DBA and should be extracted from additional named insureds section only)
+        4. Mailing Address
+        5. Policy Number
+        6. Policy Period
+        7. Issuing Company  
+        8. Premium	
+        9. Paid In Full Discount	
+        10. Miscellaneous Premium	
+        11. Location	
+        12. Limits of Liability	
+            - Extract limits which are present declaration section only, donot include other coverges limits
+        13. Deductible or Retention	
+        14. Retro Date	
+        15. Prior and Pending Date	
+        16. Continuity Date	
+        17. Underlying Insurance	
+        18. Terrorism -------  sometimes it is present in the premiums or it has a sapreate page
+        19. Exclusions --- Donot extract this datapoint, pass it has null value
+        20. Additional Coverage
+            - Extract coverages with values along with their labels
+        21. Additional Interests
+        22. Forms And Endorsements — extraction rules
+            -Extract ONLY from the "Forms And Endorsements" section.
+            -Scan to END of document.
+            -Merge multi-line entries into a single entry.
+            -Format EXACTLY as:
+                FormNumber | MM/YY Form Title
+            -If a coverage code exists, format as:
+                CoverageCode FormNumber | MM/YY Form Title
+            -Form Title Extraction Rule (STRICT)
+            -Extract a Form Title ONLY if it appears on the SAME LINE and IMMEDIATELY to the right of the Form Number and Date.
+            -If no title appears beside the form number and date on the same line, DO NOT extract a title.
+            -Do not extract titles from any other position (different line, different column, separated by layout, etc.).
+
+            --Return Requirements
+                -Return a single array of all extracted forms.
+                -Deduplicate exact duplicates only.
+                -If a form has no title, return it as:
+                -FormNumber | MM/YY
+        23. Endorsements
+            - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+            - Extract only from particular endorsement declaration page
+            
+        ### Output Rules
+        - Return **only** the structured JSON object with the keys above in the exact order.
+        - Dates → MM/DD/YYYY
+        - Currency → keep "$" and commas as shown.
+        - Missing values → null.
+        {f'Text: {large_text}' if large_text else ''}
+        """
+
+def prompt_template_errors_omissions(large_text=None):
+    return f"""
+        You are an expert insurance data extractor.
+        The following text is extracted from a Errors and Omissions insurance PDF using a mix of
+        digital text, OCR text, and tables.  
+        Some forms or endorsements may be spread across multiple pages or split into separate
+        lines. Your task is to search the **ENTIRE** document and extract every required
+        datapoint listed below.  
+
+        ### Rules for Extraction
+        - **Never stop** at the first occurrence of any section.  
+        Continue scanning until the **very end of the document** to ensure nothing is missed.
+        - Merge multi-line form numbers/titles into a **single entry** if they are split.
+        - Deduplicate only when the text is **identical**.
+        - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+        - If no value exists for a field, set it to `null`
+
+        ### Datapoints to Extract ###
+        1. Name Insured (primary insured only, do not include any other named insureds here like DBA etc) 
+        2. Other Named Insured
+            - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+            - No need extract "DBA" in value
+        3. Additional Insured (it will be with same name or other named insured or DBA and should be extracted from additional named insureds section only)
+        4. Mailing Address
+        5. Policy Number
+        6. Policy Period
+        7. Issuing Company  
+        8. Premium
+            - Need to extract with values with their labels for Premium datapoint
+        9. Paid In Full Discount	
+        10. Miscellaneous Premium	
+        11. Location	
+        12. Limits of Liability	
+        13. Deductible or Retention	
+            - Extract value with label as they mentioned in document
+        14. Retro Date	
+            - Extract value with label as they mentioned in document
+        15. Prior and Pending Date	
+        16. Continuity Date	
+        17. Underlying Insurance	
+        18. Terrorism -------  sometimes it is present in the premiums or it has a sapreate page
+        19. Exclusions --- Donot extract this datapoint, pass it has null value
+        20. Additional Coverage --- must extract value with their labels from Additional Coverage section only, no coverages should extract from other sections
+        21. Forms And Endorsements — extraction rules
+            -Extract ONLY from the "Forms And Endorsements" section.
+            -Scan to END of document.
+            -Merge multi-line entries into a single entry.
+            -Format EXACTLY as:
+                FormNumber | MM/YY Form Title
+            -If a coverage code exists, format as:
+                CoverageCode FormNumber | MM/YY Form Title
+            -Form Title Extraction Rule (STRICT)
+            -Extract a Form Title ONLY if it appears on the SAME LINE and IMMEDIATELY to the right of the Form Number and Date.
+            -If no title appears beside the form number and date on the same line, DO NOT extract a title.
+            -Do not extract titles from any other position (different line, different column, separated by layout, etc.).
+
+            --Return Requirements
+                -Return a single array of all extracted forms.
+                -Deduplicate exact duplicates only.
+                -If a form has no title, return it as:
+                -FormNumber | MM/YY
+        22. Endorsements
+            - Include: Data under Description of changes should be extracted(changed, added, deleted, estimated total premium, paid in full discount))
+            - Extract only from particular endorsement declaration page
+            
+        ### Output Rules
+        - Return **only** the structured JSON object with the keys above in the exact order.
+        - Dates → MM/DD/YYYY
+        - Currency → keep "$" and commas as shown.
+        - Missing values → null.
+        {f'Text: {large_text}' if large_text else ''}
+        """
+
+def prompt_umbrella(large_text=None):
+    return f"""
+        You are an expert insurance data extractor.
+        The following text is extracted from a Umbrella or Excess Liability insurance PDF using a mix of
+        digital text, OCR text, and tables.  
+        Some forms or endorsements may be spread across multiple pages or split into separate
+        lines. Your task is to search the **ENTIRE** document and extract every required
+        datapoint listed below.  
+
+        ### Rules for Extraction
+        - **Never stop** at the first occurrence of any section.  
+        - Continue scanning until the **very end of the document** to ensure nothing is missed.
+        - Merge multi-line form numbers/titles into a **single entry** if they are split.
+        - Deduplicate only when the text is **identical**.
+        - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+        - If no value exists for a field, set it to `null`
+
+        ### Datapoints to Extract ###
+        1. Name Insured
+        2. Other Named Insured
+            - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+            - No need extract "DBA" in value
+        3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
+        4. Mailing Address 
+        5. Policy Number
+        6. Policy Period
+        7. Issuing Company 
+        8. Premium
+            - Need to extract all premiums under the Premium declaration section
+            - Extract with combination of labels and values
+        9. Paid in Full Discount
+        10. Miscellaneous Premium (the miscellaneouspremium is mentioned as miscellaneouspremium only there is no other alternatives names)
+        11. Umbrella Limits
+            - Extract the numerical value for the 'Umbrella limit' (or 'Excess Liability limit') from the insurance document section that specifies the maximum aggregate coverage amount.
+        12. Underlying Policies
+            -Extract following datapoints
+            1.Underlying Carrier
+            2.Underlying Coverage
+            3.Underlying Policy
+            4.Underlying Term
+            5.Underlying Limits
+        13. Retention
+        14. Terrorism
+        15. Exclusions
+            - Pass this datapoint as null
+        21. Forms And Endorsements — extraction rules
+            -Extract ONLY from the "Forms And Endorsements" section.
+            -Scan to END of document.
+            -Merge multi-line entries into a single entry.
+            -Format EXACTLY as:
+                FormNumber | MM/YY Form Title
+            -If a coverage code exists, format as:
+                CoverageCode FormNumber | MM/YY Form Title
+            -Form Title Extraction Rule (STRICT)
+            -Extract a Form Title ONLY if it appears on the SAME LINE and IMMEDIATELY to the right of the Form Number and Date.
+            -If no title appears beside the form number and date on the same line, DO NOT extract a title.
+            -Do not extract titles from any other position (different line, different column, separated by layout, etc.).
+
+            --Return Requirements
+                -Return a single array of all extracted forms.
+                -Deduplicate exact duplicates only.
+                -If a form has no title, return it as:
+                -FormNumber | MM/YY
+        22. Endorsements
+            - Extract only from particular endorsement declaration section
+            - Donot extract from other than this section, do not include when value have endoresement which is not under this section
+            
+        ### Output Rules
+        - Return **only** the structured JSON object with the keys above in the exact order.
+        - Dates → MM/DD/YYYY
+        - Currency → keep "$" and commas as shown.
+        - Missing values → null.
+        {f'Text: {large_text}' if large_text else ''}
+        """
+
+def prompt_master_bop(large_text=None):
+    return f"""
+        You are an expert insurance data extractor.
+        The following text is extracted from a Master BOP insurance PDF using a mix of
+        digital text, OCR text, and tables.  
+        Some forms or endorsements may be spread across multiple pages or split into separate
+        lines. Your task is to search the **ENTIRE** document and extract every required
+        datapoint listed below.  
+
+        ### Rules for Extraction
+        - **Never stop** at the first occurrence of any section.  
+        - Continue scanning until the **very end of the document** to ensure nothing is missed.
+        - Merge multi-line form numbers/titles into a **single entry** if they are split.
+        - Deduplicate only when the text is **identical**.
+        - Preserve all numbers, dates, symbols, and formatting exactly as shown.
+        - If no value exists for a field, set it to `null`
+
+        ### Datapoints to Extract ###
+        1. Name Insured
+            -(primary insured only, do not include any other named insureds here like DBA etc) 
+        2. Other Named Insured
+            - sometimes it given as DBA and in some cases it is present below the name insured and do not extract from additional named insured section 
+            - No need extract "DBA" in value
+        3. Additional Insured (it will be with same name or other named insured or DBA ) --- for this data point ,  it has a sapreate page mentioned as Name insured schedule page or Additional insured 
+        4. Mailing Address
+           - it will be starts with number , PO BOX ,text below named or other named insured
+        5. Policy Number
+        6. Policy Period
+        7. Issuing Company
+            - Extract the company issuing or underwritting
+        8. Premium
+            - Need to extract all premiums under the Premium declaration section
+            - Extract with combination of labels and values
+        9. Paid in Full Discount
+            - Extract Paid in Full discount if present.
+        10. Miscellaneous Premium
+            - Extract only if field explicitly labeled 'miscellaneous premium'
+        11. Location
+            - no need to extract Property Location 
+            - Extract location details **only from the "declaration of location" page or section**.
+            - Do not extract location data from other sections, schedules, or tables.
+            - need to extract loc label and its value along with address
+            - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+            - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60
+        12. The datapoints mentioned from 13 to 22 should follows below description and each datapoint should treated as individual primary key
+            - Extract the value **only from the "Business Liability declaration page or section"**. Do not extract from other sections, schedules, or tables execpt.
+            - For each, include both the value (e.g., "$5,000") and any descriptive text that appears after the value (e.g., "Per Occurrence", "Any One Premise", etc.).
+            - Output format for each: "<value> <descriptive text after value>" , not like "Medical expenses": "$10,000 Medical Expenses Limit",
+            - Example: 
+                - "Medical expenses": "$5,000 Per Occurrence"
+                - "Personal And Advt Injury": "$1,000,000 Per Occurrence"
+                - "Damage to rented premises": "$50,000 Any One Premise"
+        13. General Aggregate (Extract  only if field  General Aggregate)
+        14. Products or Completed Operations Aggregate (Extract  only if field Products or Completed Operations Aggregate)
+        15. Personal And Advt Injury (Extract  only if field Personal And Advt Injury)
+        16. Medical expenses (Extract if field Medical expenses)
+        17. Damage to rented premises (Extract  if field Damage to rented premises)
+        18. Each Occurrence (Extract  if field Each Occurrence)
+        19. Deductible (extract if field as  deductible with labels if label not present then limit is enough  from General Liability)
+        20. Hired Or Non Owned Auto ("extract if field as hired and non owned auto with labels from General Liability)
+        21. "Schedule of Hazards Rating Info". Return as an array of dictionaries, each with:
+                -Class Code
+                -Classification
+                -Premium Basis
+                -Exposure
+                -Rate
+                -Premium
+        22. Additional interest
+        - From 23 to 36 extract only if field is present
+        23. Employee Benefits Liability
+        24. Directors and Officers
+        25. Cyber
+        26. Professional Liability
+        27. EPLI on Policy
+        28. Errors and Omissions on Policy
+        29. Garage Liability
+        30. Crime
+        31. Pollution Liability
+        32. Liquor Liability
+        33. Fiduciary Liability
+        34. Commercial Flood
+        35. Commercial Earthquake
+        36. Terrorism
+            - Extract terrorism coverage information with labels
+        37. The datapoints mentioned from 38 to 51 should follows below description and each datapoint should treated as individual primary key
+        - (Need to extract the datapoints in individual dictionary but not under the general liability dictionary, And this data should be extracted which is present under the property declaration page only)
+        38. Building Value
+        39. Business Personal Property Limit - (need to extract prem.no,bldg.no labels and its values along with limit data)
+        40. Business Income Limit - (must and should extract complete value of it and if value consists "INCLUDED" then "included" comes in last index of value)
+        41. Improvements and Betterments
+        42. Wind And Hail
+        43. Property Deductible - (need to extract prem.no,bldg.no labels and its values along with limit data and all deductible under this section only)
+        44. Co Insurance
+        45. Valuation
+        46. Is Equipment Breakdown Listed
+        47. Building Ordinance Or Law Listed Cov A
+        48. Building Ordinance Demolition Cost Cov B
+        49. Building Ordinance Inc Cost Of Construction Cov C
+        50. Additional Interests (extract only from property declaration page only)
+        51. Property Terrorism (data which is present in buidling prperty values under property declarations)
+        52 From 53 to 60 extract datapoints from "Commercial Auto" section only, if datapoints mentioned below are not present in this section then pass them null
+        53. Symbol (extract only which was selected by crossmark and extract all of them as individual)
+                - Example:"symbol": [
+                        "Combined Liability": "7, 8, 9, 19",
+                        "Uninsured Motorist": "6",
+                        "Underinsured Motorist": "6",
+                        "Personal Injury Protection": "7",
+                        "Comprehensive": "7",
+                        "Collision": "7",
+                        "Road Trouble Service": "7",
+                        "Additional Expense": "7"]
+        54. Limits (return only coverage limits with values, when there is no value dont extract the label)
+                - Extract only from declaration page only, not from hired and non owned auto pages
+                - Example: [LIABILITY- BI EACH ACCIDENT : $1000000
+                        MEDICAL PAYMENTS -EACH PERSON : $5000]
+        55. Vehicles Info (extract following datapoints)
+                1. VIN
+                2. Year
+                3. Make
+                4. Model
+                5. Cost New
+                6. Premium
+                - Must capture all vehicles listed with full details
+                - Return costnew values also if and if it is present under this section only
+        56. Scheduled Drivers → [{{NameLast, FirstName, DOB or Age, State, License Number, Premium}}]  
+        57. Hired Or Non-Owned Auto Limits → (extract all the data  if field as Hired Or Non owned Auto Limits with labels  from auto lob)
+        58. Drive Other Car Coverage   (extract all the data  if field as Drive Other Car Coverage Auto Limits with labels  from auto lob )
+        59. Lein Holder or Loss Payee (extract all the data  if field as Lein Holder or Loss Payee with labels  from auto lob)
+        60. Auto Terrorism (extract all the data  if field as Auto Terrorism with labels  from auto lob )
+        61. From 62 to 75 extract them from only "Workers Compensation" declaration section
+        62. Locations
+            - Extract location details **only from the "declaration of location" page or section**.
+            - Do not extract location data from other sections, schedules, or tables.
+            - need to extract loc label and its value along with address
+            - Example:"Loc 1  1731 W Business U.S. 60, ---- if any one those are lisited in the document we have to extract in location                                                                                                   
+            - sometimes BLDG label is also present in some document , in that case the output should be like -- "Loc 1 - BLDG 1 - 1731 W Business U.S. 60  
+            - if one or more location is present we have to extract like this --- 
+                - If multiple locations are listed in the declaration of location, return all as an array 
+                Example 2 -- 
+                    "Location": [
+                        {{
+                        "Loc No : 1 - 1 Embarcadero Ctr, San Francisco, CA 94111",
+                        }},
+                        {{
+                        "Loc No : 2 - 799 Battery St, San Francisco, CA 94111",
+                        }}
+                        ],
+            - If no location is found in the declaration of location, set this field to null. -- yes 
+        63. Fein
+        64. Coverage States
+        65. Other States
+        66. Employers Limits  --------------------- Employers Liability Insurance: this is the label to identify the employee limits in that we have to extract all the limits present in that section 
+            - Extract: ALL employer limits listed
+            - example : "Employers Limits": [
+                            {{
+                            "Bodily Injury by Accident  $100,000 each accident",
+                            }},
+                            {{
+                            "Bodily Injury by Disease  $100,000 policy limit",
+                            }},
+                            {{
+                            "Bodily Injury by Disease  $100,000 each employee",
+                            }}
+                        ], 
+        - from 67 to 71 all data points must should comes in one label Rating Info and in that section premium and other lables also lisited we have to extract those also 
+            -- Must and should extract in format mentioned below example
+            example -- 
+                "Rating Info": [
+                {{
+                    "value": "8391 - AUTOMOBILE REPAIR SHOP & PARTS DEPARTMENT EMPLOYEES, DRIVERS - Estimated Payroll : 348,835 - Rate : 2.465- Premium : 20,352",
+                }},
+                {{
+                    "value": "8810 - CLERICAL OFFICE EMPLOYEES NOC - Estimated Payroll : 4,820 - Rate : 0.125 - Premium : 103",
+                }}
+                    ], 
+
+                example 2 --- 
+                        "Rating Info": [
+                        {{
+                        "value": "State: CA - Loc No : 1 - 8078 - SANDWICH SHOPS - N.O.C. - not restaurants, bars or taverns - Estimated Payroll  $48,000 - Rate : - 1.79 - Net Rate : 1.67 - Manual Premium : $859",
+                        "type": "string"
+                        }},
+                        {{
+                        "value": "State: CA - Loc No : 2 - 8078 - SANDWICH SHOPS - N.O.C. - not restaurants, bars or taverns - Estimated Payroll  $24,000 - Rate : - 1.79 - Net Rate : 1.67 - Manual Premium : $430",
+                        "type": "string"
+                        }}
+                        ],
+        67. Class code
+        68. Classification
+        69. Estimated Payroll
+        70. Rate
+        71. No Of Employees
+        72. Experience Mod --- it is mentioned as same name no other alternative 
+        73. Changes in Credits --- it is mentioned as same name no other alternative 
+        74. Members Excluded--- it is mentioned as same name no other alternative 
+        75. WC Terrorism -------  sometimes it is present in the premiums or it has a sapreate page 
+        76. From 77 to 84, extract datapoints from "Inland Marine" section only
+        77. Inland Marine Details
+        78. Equipment Shedule
+        79. Deductibles
+        80. Loss Payee (extract all the data  if field as Loss Payee/mortgagee from inland marine lob)
+        81. Rental equipment from others
+        82. Rental equipment to others
+        83. Installation floater
+        84. Inland Marine Terrorism
+        85. From 86 to 87, extract datapoints from "Commercial Umbrella" section only
+        86. Umbrella Limits
+            - Extract the numerical value for the 'Umbrella limit' (or 'Excess Liability limit') from the insurance document section that specifies the maximum aggregate coverage amount.
+        87. Underlying Policies
+            -Extract following datapoints
+                1.Underlying Carrier
+                2.Underlying Coverage
+                3.Underlying Policy
+                4.Underlying Term
+                5.Underlying Limits
+        88. Policy Exclusions
+            -extract all the data  if field as Policy Exclusions
+        89. Additional Coverage
+            -extract all the limits with labels which are not included in main datapoints anther named as coverages/limit of insurance /sublimits/additional coverages
+        90. Forms And Endorsements
+            -Extract ONLY from the "Forms And Endorsements" section.
+            -Scan to END of document.
+            -Merge multi-line entries into a single entry.
+            -Format EXACTLY as:
+                FormNumber | MM/YY Form Title
+            -If a coverage code exists, format as:
+                CoverageCode FormNumber | MM/YY Form Title
+            -Form Title Extraction Rule (STRICT)
+            -Extract a Form Title ONLY if it appears on the SAME LINE and IMMEDIATELY to the right of the Form Number and Date.
+            -If no title appears beside the form number and date on the same line, DO NOT extract a title.
+            -Do not extract titles from any other position (different line, different column, separated by layout, etc.).
+
+            --Return Requirements
+                -Return a single array of all extracted forms.
+                -Deduplicate exact duplicates only.
+                -If a form has no title, return it as:
+                -FormNumber | MM/YY
+        91. Endorsements
+            - Extract only from particular endorsement declaration
+            - Extract Description of Changes (changed, added, deleted, premium changes) from endorsement declaration page.
+        
+        ### Output Rules
+        - Return **only** the structured JSON object with the keys above in the exact order.
+        - Dates → MM/DD/YYYY
+        - Currency → keep "$" and commas as shown.
+        - Missing values → null.
+        {f'Text: {large_text}' if large_text else ''}
+        """
