@@ -84,26 +84,26 @@ from utils.data_points import (
         umbrella_points,
         master_business_owners_points
     )
-    from utils.queryy import (
-        prompt_template_cyber,
-        prompt_template_general,
-        prompt_template_commercial_auto,
-        prompt_template_general_liability,
-        prompt_template_property,
-        prompt_template_business_owner,
-        prompt_template_package,
-        prompt_template_workers_compensation,
-        prompt_template_builder_risk,
-        prompt_template_commercial_earthquake,
-        prompt_template_commercial_fire,
-        prompt_template_commercial_flood,
-        prompt_template_crime,
-        prompt_template_directors_and_officers,
-        prompt_template_dwelling_fire,
-        prompt_template_epli,
-        prompt_template_errors_omissions,
-        prompt_umbrella,
-        prompt_master_bop
+from utils.query import (
+    prompt_template_cyber,
+    prompt_template_general,
+    prompt_template_commercial_auto,
+    prompt_template_general_liability,
+    prompt_template_property,
+    prompt_template_business_owner,
+    prompt_template_package,
+    prompt_template_workers_compensation,
+    prompt_template_builder_risk,
+    prompt_template_commercial_earthquake,
+    prompt_template_commercial_fire,
+    prompt_template_commercial_flood,
+    prompt_template_crime,
+    prompt_template_directors_and_officers,
+    prompt_template_dwelling_fire,
+    prompt_template_epli,
+    prompt_template_errors_omissions,
+    prompt_umbrella,
+    prompt_master_bop
     )
 
 prompt_map = {
@@ -128,28 +128,27 @@ prompt_map = {
         "master_bop" : prompt_master_bop
 
     }
-
-    data_points_map = {
-        "cyber": cyber_data_points,
-        "general": business_owner_data_points,
-        "comercial_auto": comercial_auto_data_points,
-        "general_liability": general_liability_data_points,
-        "property": property_data_points,
-        "business_owner": business_owner_data_points,
-        "package": business_owner_data_points,
-        "workers_comp": workers_compensation_points,
-        "builders_risk": builder_risk_points,
-        "commercial_earthquake": commercial_earthquake_points,
-        "commercial_fire": commercial_fire_points,
-        "commercial_flood": commercial_flood_points,
-        "crime" : crime_points,
-        "directors_and_officers" : directors_and_officers_points,
-        "dwelling_fire" : dwelling_fire_points,
-        "epli" : epli_points,
-        "errors_and_omissions" : errors_omissions_points,
-        "umbrella" : umbrella_points,
-        "master_bop" : master_business_owners_points
-    }
+data_points_map = {
+    "cyber": cyber_data_points,
+    "general": business_owner_data_points,
+    "comercial_auto": comercial_auto_data_points,
+    "general_liability": general_liability_data_points,
+    "property": property_data_points,
+    "business_owner": business_owner_data_points,
+    "package": business_owner_data_points,
+    "workers_comp": workers_compensation_points,
+    "builders_risk": builder_risk_points,
+    "commercial_earthquake": commercial_earthquake_points,
+    "commercial_fire": commercial_fire_points,
+    "commercial_flood": commercial_flood_points,
+    "crime" : crime_points,
+    "directors_and_officers" : directors_and_officers_points,
+    "dwelling_fire" : dwelling_fire_points,
+    "epli" : epli_points,
+    "errors_and_omissions" : errors_omissions_points,
+    "umbrella" : umbrella_points,
+    "master_bop" : master_business_owners_points
+}
 
 
 # Create necessary directories
